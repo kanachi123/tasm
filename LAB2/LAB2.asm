@@ -1,0 +1,47 @@
+DSEG SEGMENT
+MSG1 DB 'HELLO WORLD',0dh,0ah,'$'
+
+BUF DB 20,?,20 DUP(?)
+MSG2 DB 'ENTER STRING: $'
+
+DSEG ENDS
+
+CSEG SEGMENT
+    ASSUME CS:CSEG,DS:DSEG
+START:
+    MOV AX,DSEG
+    MOV DS,AX
+    
+    MOV DX,OFFSET MSG1
+    MOV AH,9
+    INT 21H
+    
+    MOV DX,OFFSET MSG2
+    MOV AH,9
+    INT 21H
+    
+    MOV DX,OFFSET BUF
+    MOV AH,0Ah
+    INT 21h
+    
+    MOV BL,[BUF+1]
+    MOV BH,0;BH->0(8BIT),BL->(8BIT)->BX=0005h 16BIT REG FOR ADD
+    LEA SI,[BUF+2];LEA->LOAD EFFECTIVE ADDRESS ->FIRST SYM ADR -> SI REG
+    ADD SI,BX;SI=2002h,BX=0005h->SI=2007h BYT LST SYM
+    MOV BYTE PTR[SI],'$'; $ ->[BUF+7]->'TEXT$'
+    
+    MOV DL, 0Dh;\r -> 0Dh \n-> 0Ah
+    MOV AH, 2
+    INT 21h
+    MOV DL, 0Ah
+    INT 21h
+    
+    LEA DX, [BUF+2]
+    MOV AH, 9
+    INT 21h;text->out-> 20,5,'T','E','X','T','$','\r','\n'
+    
+    MOV AH,4CH
+    MOV AL,0
+    INT 21H
+CSEG ENDS
+    END START
