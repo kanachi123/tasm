@@ -1,0 +1,43 @@
+SSEG SEGMENT
+    DB 256 DUP(?)
+SSEG ENDS
+CSEG SEGMENT
+    ASSUME CS:CSEG,SS:SSEG
+START:
+    MOV AX,0003H
+    INT 10H
+    MOV DX,0
+    MOV SI,256
+    MOV AL,0
+    MOV AH,9
+    MOV CX,1
+    MOV BL,01010111B
+L1:
+    INT 10H
+    PUSH AX
+    MOV AH,2
+    INC DL
+    INT 10H
+    MOV AH,2
+    INC DL
+    INT 10H
+    POP AX
+    
+    INC AL
+    TEST AL,0FH
+    JNZ L2
+    PUSH AX
+    MOV AH,2
+    INC DH
+    MOV DL,0
+    INT 10H 
+    POP AX
+    
+L2:
+    DEC SI
+    JNZ L1
+    MOV AH,4CH
+    MOV AL,0
+    INT 21
+CSEG ENDS
+    END START

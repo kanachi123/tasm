@@ -1,0 +1,100 @@
+SSEG SEGMENT STACK
+    DW 128 DUP(?)
+    ;scf DW 2
+    ;scn DW 3
+SSEG ENDS
+CSEG SEGMENT
+    ASSUME CS:CSEG, SS:SSEG
+
+DRAW_SQUARE PROC NEAR
+    PUSH CX
+    PUSH DX
+    PUSH SI
+
+    MOV SI, DI
+L1:
+    MOV AH,0Ch
+    MOV BH,0
+    INT 10h
+    INC CX
+    DEC SI
+    JNZ L1
+
+    MOV SI, DI
+L2:
+    MOV AH,0Ch
+    MOV BH,0
+    INT 10h
+    INC DX
+    DEC SI
+    JNZ L2
+
+    MOV SI, DI
+L3:
+    MOV AH,0Ch
+    MOV BH,0
+    INT 10h
+    DEC CX
+    DEC SI
+    JNZ L3
+
+    MOV SI, DI
+L4:
+    MOV AH,0Ch
+    MOV BH,0
+    INT 10h
+    DEC DX
+    DEC SI
+    JNZ L4
+
+    POP SI
+    POP DX
+    POP CX
+    RET
+DRAW_SQUARE ENDP
+
+
+MULTI PROC NEAR
+    MOV DI, 7;SIZE SQUARE
+    MOV AL, 14;YELLOW
+
+    MOV CX, 100
+    MOV DX, 100
+
+    MOV SI, 2;scf
+FIRST:
+    CALL DRAW_SQUARE
+    ADD CX, 80
+    ADD DX, 80
+    DEC SI
+    JNZ FIRST
+
+    MOV SI, 3;scn
+NEXT:
+    CALL DRAW_SQUARE
+    ADD CX, 80
+    SUB DX, 80
+    DEC SI
+    JNZ NEXT
+
+    RET
+MULTI ENDP
+
+
+START:
+    MOV AX,0012h
+    INT 10h
+
+    CALL MULTI
+
+    MOV AH,00h
+    INT 16h
+
+    MOV AX,0003h
+    INT 10h
+
+    MOV AH,4Ch
+    INT 21h
+
+CSEG ENDS
+END START
